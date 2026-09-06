@@ -30,7 +30,6 @@ public class ClientConnectionInit {
 
             ProxyHandler proxyHandler = createProxyHandler(proxy);
             if (proxyHandler != null) {
-                // 明確命名並加入 Pipeline 首位
                 channel.pipeline().addFirst(PROXY_HANDLER_NAME, proxyHandler);
             }
         } else {
@@ -57,7 +56,6 @@ public class ClientConnectionInit {
     @Unique
     private void updateMenuButtonLabel() {
         if (ProxyServer.proxyMenuButton != null) {
-            // 使用 Minecraft 原生語系鍵值替換硬編碼文字 "Proxy: "
             ProxyServer.proxyMenuButton.setMessage(
                     Component.translatable("gui.proxyserver.button.status", ProxyServer.getLastUsedProxyIp())
             );
