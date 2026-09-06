@@ -1,4 +1,6 @@
 {
+  "modmenu.nameTranslation.proxyserver": "代理伺服器",
+  "modmenu.descriptionTranslation.proxyserver": "允許你透過代理連線至伺服器",
   "gui.proxyserver.title": "代理伺服器設定",
   "gui.proxyserver.button.status": "代理伺服器: %s",
   "gui.proxyserver.button.type": "類型: %s",
