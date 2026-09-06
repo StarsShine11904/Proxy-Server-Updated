@@ -6,53 +6,70 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.client.Minecraft;
-import org.apache.commons.io.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Config {
-    private static final String CONFIG_PATH = Minecraft.getInstance().gameDirectory + "/config/ProxyServerConfig.json";
+    public static final String DEFAULT_PLAYER_NAME = "";
+    
+    private static final String CONFIG_DIR_NAME = "config";
+    private static final String CONFIG_FILE_NAME = "ProxyServerConfig.json";
+
+    private static final String KEY_LAST_PLAYER_NAME = "lastPlayerName";
+    private static final String KEY_PROXY_ENABLED = "proxy-enabled";
+    private static final String KEY_PROXY = "proxy";
+    private static final String KEY_ACCOUNTS = "accounts";
+
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Type ACCOUNTS_TYPE = new TypeToken<HashMap<String, Proxy>>() {}.getType();
+
     public static Map<String, Proxy> accounts = new HashMap<>();
-    public static String lastPlayerName = "";
+    public static String lastPlayerName = DEFAULT_PLAYER_NAME;
+
+    public static Path getConfigPath() {
+        Path gameDir = Minecraft.getInstance().gameDirectory.toPath();
+        return gameDir.resolve(CONFIG_DIR_NAME).resolve(CONFIG_FILE_NAME);
+    }
 
     public static void loadConfig() {
-        File configFile = new File(CONFIG_PATH);
+        Path configPath = getConfigPath();
         try {
-            if (!configFile.exists()) {
+            if (!Files.exists(configPath)) {
                 saveConfig();
                 return;
             }
 
-            String configString = FileUtils.readFileToString(configFile, StandardCharsets.UTF_8);
-            if (!configString.isEmpty()) {
-                JsonObject configJson = JsonParser.parseString(configString).getAsJsonObject();
+            String configString = Files.readString(configPath, StandardCharsets.UTF_8);
+            if (configString.isBlank()) {
+                return;
+            }
 
-                if (configJson.has("lastPlayerName")) {
-                    lastPlayerName = configJson.get("lastPlayerName").getAsString();
-                }
+            JsonObject configJson = JsonParser.parseString(configString).getAsJsonObject();
 
-                if (configJson.has("proxy-enabled")) {
-                    ProxyServer.proxyEnabled = configJson.get("proxy-enabled").getAsBoolean();
-                }
+            if (configJson.has(KEY_LAST_PLAYER_NAME)) {
+                lastPlayerName = configJson.get(KEY_LAST_PLAYER_NAME).getAsString();
+            }
 
-                if (configJson.has("proxy")) {
-                    ProxyServer.proxy = GSON.fromJson(configJson.get("proxy"), Proxy.class);
-                }
+            if (configJson.has(KEY_PROXY_ENABLED)) {
+                ProxyServer.proxyEnabled = configJson.get(KEY_PROXY_ENABLED).getAsBoolean();
+            }
 
-                Type type = new TypeToken<HashMap<String, Proxy>>() {}.getType();
-                if (configJson.has("accounts")) {
-                    accounts = GSON.fromJson(configJson.get("accounts"), type);
-                }
+            if (configJson.has(KEY_PROXY)) {
+                ProxyServer.proxy = GSON.fromJson(configJson.get(KEY_PROXY), Proxy.class);
+            }
 
-                if (accounts == null) {
-                    accounts = new HashMap<>();
-                }
+            if (configJson.has(KEY_ACCOUNTS)) {
+                accounts = GSON.fromJson(configJson.get(KEY_ACCOUNTS), ACCOUNTS_TYPE);
+            }
+
+            if (accounts == null) {
+                accounts = new HashMap<>();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,15 +77,20 @@ public class Config {
     }
 
     public static void saveConfig() {
+        Path configPath = getConfigPath();
         try {
             JsonObject configJson = new JsonObject();
 
-            configJson.addProperty("lastPlayerName", lastPlayerName);
-            configJson.addProperty("proxy-enabled", ProxyServer.proxyEnabled);
-            configJson.add("proxy", GSON.toJsonTree(ProxyServer.proxy));
-            configJson.add("accounts", GSON.toJsonTree(accounts));
+            configJson.addProperty(KEY_LAST_PLAYER_NAME, lastPlayerName);
+            configJson.addProperty(KEY_PROXY_ENABLED, ProxyServer.proxyEnabled);
+            configJson.add(KEY_PROXY, GSON.toJsonTree(ProxyServer.proxy));
+            configJson.add(KEY_ACCOUNTS, GSON.toJsonTree(accounts));
 
-            FileUtils.write(new File(CONFIG_PATH), GSON.toJson(configJson), StandardCharsets.UTF_8);
+            if (configPath.getParent() != null) {
+                Files.createDirectories(configPath.getParent());
+            }
+
+            Files.writeString(configPath, GSON.toJson(configJson), StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }
