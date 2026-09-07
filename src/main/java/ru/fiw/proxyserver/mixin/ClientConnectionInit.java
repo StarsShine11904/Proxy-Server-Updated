@@ -1,7 +1,6 @@
 package ru.fiw.proxyserver.mixin;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.handler.proxy.ProxyHandler;
 import io.netty.handler.proxy.Socks4ProxyHandler;
 import io.netty.handler.proxy.Socks5ProxyHandler;
@@ -57,7 +56,7 @@ public class ClientConnectionInit {
     private void updateMenuButtonLabel() {
         if (ProxyServer.proxyMenuButton != null) {
             ProxyServer.proxyMenuButton.setMessage(
-                    Component.translatable("gui.proxyserver.button.status", ProxyServer.getLastUsedProxyIp())
+                    Component.translatable("gui.proxyserver.button.status", ProxyServer.getLastUsedProxyDisplayComponent())
             );
         }
     }
