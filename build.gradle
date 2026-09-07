@@ -35,7 +35,7 @@ processResources {
     }
 }
 
-def targetJavaVersion = Integer.parseInt(project.findProperty("java_version") ?: "21")
+def targetJavaVersion = Integer.parseInt(project.findProperty("java_version") ?: "25")
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
