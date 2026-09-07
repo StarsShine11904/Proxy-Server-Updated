@@ -59,7 +59,7 @@ public class MultiplayerScreenOpen {
         int buttonX = screen.width - BUTTON_WIDTH - BUTTON_MARGIN_RIGHT;
 
         ProxyServer.proxyMenuButton = Button.builder(
-                Component.translatable("gui.proxyserver.button.status", ProxyServer.getLastUsedProxyIp()),
+                Component.translatable("gui.proxyserver.button.status", ProxyServer.getLastUsedProxyDisplayComponent()),
                 button -> Minecraft.getInstance().setScreenAndShow(new GuiProxy(screen))
         ).bounds(buttonX, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT).build();
 
