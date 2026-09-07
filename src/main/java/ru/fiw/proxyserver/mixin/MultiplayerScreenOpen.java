@@ -63,9 +63,6 @@ public class MultiplayerScreenOpen {
                 button -> Minecraft.getInstance().setScreenAndShow(new GuiProxy(screen))
         ).bounds(buttonX, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT).build();
 
-        ScreenAccessor sa = (ScreenAccessor) screen;
-        sa.getRenderables().add(ProxyServer.proxyMenuButton);
-        sa.getNarratables().add(ProxyServer.proxyMenuButton);
-        sa.getChildren().add(ProxyServer.proxyMenuButton);
+        ((ScreenAccessor) screen).invokeAddRenderableWidget(ProxyServer.proxyMenuButton);
     }
 }
