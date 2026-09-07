@@ -29,6 +29,6 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Mod-Jar
+          name: Proxy-Server-Updated
           path: build/libs/*Updated*.jar
           if-no-files-found: error
